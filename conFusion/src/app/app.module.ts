@@ -25,8 +25,11 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 //--------------------------Form Modules--------------------------
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-//--------------------------Routing Modules
+//--------------------------Routing Modules--------------------------
 import { AppRoutingModule } from './app-routing/app-routing.module'
+
+//--------------------------Http Modules--------------------------
+import { HttpClientModule } from '@angular/common/http';
 
 //--------------------------Components--------------------------
 import { AppComponent } from './app.component';
@@ -71,11 +74,14 @@ import { LoginComponent } from './login/login.component';
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
+    HttpClientModule
   ],
   entryComponents: [
     LoginComponent
   ],
-  providers: [],
+  providers: [
+    { provide: 'baseURL', useValue: "http://localhost:3000/" }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
