@@ -35,9 +35,9 @@
             </div>
         </div>
     </div>
-    <div fxFlex fxFlexOffset="20px" class="form-size">
+
+    <div fxFlex fxFlexOffset="20px" class="form-size" [hidden]="!showForm" [@expand]>
         <h3>Send us your Feedback</h3>
-        <p>{{ feedbackForm.value | json }} {{ feedbackForm.status | json }}</p>
         
         <form novalidate [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
             <p>
@@ -53,7 +53,7 @@
             </p>
             <p>
                 <mat-form-field class="half-width">
-                    <input matInput formControlName="telnum" placeholder="Tel. Number" type="tel" required>
+                    <input matInput formControlName="telnum" placeholder="Tel. Number" type="number" required>
                     <mat-error *ngIf="formErrors.telnum">{{formErrors.telnum}}</mat-error>
                 </mat-form-field>
                 
@@ -81,5 +81,20 @@
             </p>
             <button type="submit" mat-button class="background-primary text-floral-white">Submit</button>
         </form>
+    </div>
+    <div [hidden]="!spinnerFlag" [@expand]>
+        <mat-spinner></mat-spinner><h4>Submitting . . . Please Wait</h4>
+    </div>
+    <div [hidden]="!feedback" *ngIf="feedback" [@expand]>
+        <mat-list>
+            <mat-list-item>
+                <p matLine><b>Firstname:</b>    <span>{{feedback.firstname}}</span></p>
+                <p matLine><b>Lastname:</b>     <span>{{feedback.lastname}}</span></p>
+                <p matLine><b>Telnum:</b>       <span>{{feedback.telnum}}</span></p>
+                <p matLine><b>Email:</b>        <span>{{feedback.email}}</span></p>
+                <p matLine *ngIf="feedback.agree"><b>Contact Type:</b> <span>{{feedback.contacttype}}</span></p>
+                <p matLine><b>Message:</b>      <span>{{feedback.message}}</span></p>
+            </mat-list-item>
+        </mat-list>
     </div>
 </div>

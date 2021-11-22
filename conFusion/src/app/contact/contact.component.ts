@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { flyInOut } from '../animations/app.animation';
+import { expand, flyInOut } from '../animations/app.animation';
+import { FeedbackService } from '../services/feedback.service';
 
 import { Feedback, ContactType } from '../shared/feedback';
 
@@ -13,7 +14,7 @@ import { Feedback, ContactType } from '../shared/feedback';
     '[@flyInOut]': 'true',
     'style': 'display: block;'
     },
-  animations: [ flyInOut() ]
+  animations: [ flyInOut(), expand() ]
 })
 export class ContactComponent implements OnInit {
 
@@ -22,6 +23,8 @@ export class ContactComponent implements OnInit {
   feedbackForm: FormGroup;
   feedback: Feedback;
   contactType = ContactType;
+  spinnerFlag: boolean = false;
+  showForm: boolean = true;
 
   formErrors = {
     'firstname': '',
@@ -52,7 +55,8 @@ export class ContactComponent implements OnInit {
   };
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private feedbackService: FeedbackService
   ) {}
 
   ngOnInit(): void {
@@ -64,7 +68,7 @@ export class ContactComponent implements OnInit {
     this.feedbackForm = this.fb.group({
       firstname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)] ],
       lastname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)] ],
-      telnum: ['', [Validators.required, Validators.pattern('[6-9]\\d{9}')] ],
+      telnum: [ 0 , [Validators.required, Validators.pattern('[- +()0-9]+')] ],
       email: ['', [Validators.required, Validators.email] ],
       agree: false,
       contacttype: 'None',
@@ -78,16 +82,29 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit() {
-    this.feedback = this.feedbackForm.value;
-    console.log(this.feedback);
-    this.feedbackForm.reset({
-      firstname: '',
-      lastname: '',
-      telnum: '',
-      email: '',
-      agree: false,
-      contacttype: 'None',
-      message: ''
+    const temp :Feedback = { ...this.feedbackForm.value };
+    this.spinnerFlag = true;
+    this.showForm = false;
+    
+    this.feedbackService.submitFeedback(temp).subscribe(res => {
+      this.spinnerFlag = false;
+      this.feedback = res;
+      
+      setTimeout(
+        () => {
+          this.feedback = undefined;
+          this.showForm = true;
+          this.feedbackForm.reset({
+            firstname: '',
+            lastname: '',
+            telnum: '',
+            email: '',
+            agree: false,
+            contacttype: 'None',
+            message: ''
+          });
+        }, 5000);
+
     });
     //this.feedbackFormDirective.resetForm();
   }
